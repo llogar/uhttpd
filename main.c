@@ -141,6 +141,7 @@ static int usage(const char *name)
 		"	-K file         ASN.1 server private key file\n"
 		"	-P ciphers      Colon separated list of allowed TLS ciphers\n"
 		"	-q              Redirect all HTTP requests to HTTPS\n"
+		"	-b client_ca    Enable TLS client auth using client_ca for certificate selection\n"
 #endif
 		"	-h directory    Specify the document root, default is '.'\n"
 		"	-E string       Use given virtual URL as 404 error handler\n"
@@ -252,6 +253,7 @@ int main(int argc, char **argv)
 #ifdef HAVE_TLS
 	int n_tls = 0;
 	const char *tls_key = NULL, *tls_crt = NULL, *tls_ciphers = NULL;
+	const char *tls_client_ca = NULL;
 #endif
 #ifdef HAVE_LUA
 	const char *lua_prefix = NULL, *lua_handler = NULL;
@@ -263,7 +265,7 @@ int main(int argc, char **argv)
 	init_defaults_pre();
 	signal(SIGPIPE, SIG_IGN);
 
-	while ((ch = getopt(argc, argv, "A:aC:c:Dd:E:e:fh:H:I:i:K:k:L:l:m:N:n:P:p:qRr:Ss:T:t:U:u:Xx:y:")) != -1) {
+	while ((ch = getopt(argc, argv, "A:ab:C:c:Dd:E:e:fh:H:I:i:K:k:L:l:m:N:n:P:p:qRr:Ss:T:t:U:u:Xx:y:")) != -1) {
 		switch(ch) {
 #ifdef HAVE_TLS
 		case 'C':
@@ -280,6 +282,10 @@ int main(int argc, char **argv)
 
 		case 'q':
 			conf.tls_redirect = 1;
+			break;
+
+		case 'b':
+			tls_client_ca = optarg;
 			break;
 
 		case 's':
@@ -535,7 +541,7 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		if (uh_tls_init(tls_key, tls_crt, tls_ciphers))
+		if (uh_tls_init(tls_key, tls_crt, tls_ciphers, tls_client_ca))
 		    return 1;
 	}
 #endif

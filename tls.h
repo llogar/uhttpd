@@ -22,7 +22,7 @@
 
 #ifdef HAVE_TLS
 
-int uh_tls_init(const char *key, const char *crt, const char *ciphers);
+int uh_tls_init(const char *key, const char *crt, const char *ciphers, const char *client_ca);
 void uh_tls_client_attach(struct client *cl);
 void uh_tls_client_detach(struct client *cl);
 

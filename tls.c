@@ -31,7 +31,7 @@ static struct ustream_ssl_ops *ops;
 static void *dlh;
 static void *ctx;
 
-int uh_tls_init(const char *key, const char *crt, const char *ciphers)
+int uh_tls_init(const char *key, const char *crt, const char *ciphers, const char *client_ca)
 {
 	static bool _init = false;
 
@@ -65,6 +65,11 @@ int uh_tls_init(const char *key, const char *crt, const char *ciphers)
 
 	if (ciphers && ops->context_set_ciphers(ctx, ciphers)) {
 		fprintf(stderr, "No recognized ciphers in cipher list\n");
+		return -EINVAL;
+	}
+
+	if (client_ca && (ops->context_set_require_validation(ctx, 1) || ops->context_add_ca_crt_file(ctx, client_ca))) {
+		fprintf(stderr, "Can not enable TLS client authentication\n");
 		return -EINVAL;
 	}
 

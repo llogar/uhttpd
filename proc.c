@@ -90,6 +90,9 @@ enum extra_vars {
 	VAR_PATH_INFO,
 	VAR_USER,
 	VAR_HTTPS,
+	VAR_HTTPS_CLIENT_CERT,
+	VAR_HTTPS_CLIENT_CERT_SHA256,
+	VAR_HTTPS_CLIENT_CERT_SN,
 	VAR_REDIRECT,
 	VAR_SERVER_NAME,
 	VAR_SERVER_ADDR,
@@ -118,6 +121,9 @@ static struct env_var extra_vars[] = {
 	[VAR_PATH_INFO] = { "PATH_INFO" },
 	[VAR_USER] = { "REMOTE_USER" },
 	[VAR_HTTPS] = { "HTTPS" },
+	[VAR_HTTPS_CLIENT_CERT] = { "HTTPS_CLIENT_CERT" },
+	[VAR_HTTPS_CLIENT_CERT_SHA256] = { "HTTPS_CLIENT_CERT_SHA256" },
+	[VAR_HTTPS_CLIENT_CERT_SN] = { "HTTPS_CLIENT_CERT_SN" },
 	[VAR_REDIRECT] = { "REDIRECT_STATUS", redirect_status },
 	[VAR_SERVER_NAME] = { "SERVER_NAME", local_addr },
 	[VAR_SERVER_ADDR] = { "SERVER_ADDR", local_addr },
@@ -154,6 +160,9 @@ struct env_var *uh_get_process_vars(struct client *cl, struct path_info *pi)
 	extra_vars[VAR_PATH_INFO].value = pi->info;
 	extra_vars[VAR_USER].value = req->realm ? req->realm->user : NULL;
 	extra_vars[VAR_HTTPS].value = cl->tls ? "on" : NULL;
+	extra_vars[VAR_HTTPS_CLIENT_CERT].value = cl->ssl.peer_cert;
+	extra_vars[VAR_HTTPS_CLIENT_CERT_SHA256].value = cl->ssl.peer_cert ? cl->ssl.peer_cert_sha256 : NULL;
+	extra_vars[VAR_HTTPS_CLIENT_CERT_SN].value = cl->ssl.peer_cert_sn;
 
 	snprintf(redirect_status, sizeof(redirect_status),
 		 "%d", req->redirect_status);
